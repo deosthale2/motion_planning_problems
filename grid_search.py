@@ -5,6 +5,33 @@ DELTA_NAMES = ['v', '>', '<', '^']
 STEPS = [[-1, 0], [0, -1], [0, 1], [1, 0]]
 
 def search(grid, init, goal, cost):
+	'''
+	Given a 2D grid, an initial position and a goal position, ...
+	... find the cost of reaching to the goal from the...
+	... initial position.
+
+	Input:
+		grid: a 2D grid in the form of a list of lists
+			  obstacle locations have value 1; open spaces with 0
+		init: initial location [r, c]
+		goal: goal location [r, c]
+		cost: starting cost of the initial location
+
+	Output:
+		loc_cost: number of steps to get to goal + initial cost
+		loc: goal if reached
+	
+	The cost is the number of steps to get to the goal position
+
+	This algorithm works by expanding the grid from the start position...
+	... and the expansion always takes place in the direction of...
+	... the lowest cost.
+
+	Algorithm maintains a list of expanded grid-cells in an open_list...
+	and a list of visited grid-cells in a closed_list
+
+	The robot is allowed to move in 4 directions (up, down, left, right)
+	'''
 	loc, loc_cost = init, 0
 	open_list, cost_list, closed_list = [], [], [loc]
 
