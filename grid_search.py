@@ -85,7 +85,7 @@ def search_expand(grid, init, goal, cost):
 	Output:
 		expand: 2D grid with cell values representing the step at...
 				which the cell was expanded
-				
+
 	The cost is the number of steps to get to the goal position
 
 	This algorithm works by expanding the grid from the start position...
@@ -139,6 +139,15 @@ def search_expand(grid, init, goal, cost):
 
 
 def search_path(grid, init, goal, cost):
+	'''
+	Given a 2D grid, an initial position and a goal position, ...
+	... find the shortest path to reach the goal from the...
+	... initial position.
+
+	The path also indicates the maneuver that had to be done.
+
+	[^, v, <, >] indicate [up, down, left, right] maneuvers.
+	'''
 	loc, loc_cost = init, 0
 	open_list, cost_list, closed_list = [], [], [loc]
 	cost_nodes = [[init]]
@@ -147,15 +156,18 @@ def search_path(grid, init, goal, cost):
 	while loc != goal:
 		for step in [[-1, 0], [0, -1], [0, 1], [1, 0]]:
 			loc_ = [loc[0] + step[0], loc[1] + step[1]]
+			# check for grid boundary
 			if any([pos<0 for pos in loc_]) or loc_[0]>len(grid)-1 or loc_[1]>len(grid[0])-1:
 				continue
+			# check for obstacles
 			if grid[loc_[0]][loc_[1]] == 1:
 				closed_list += [loc_]
 				continue
+			# expand into open spaces
 			elif loc_ not in closed_list and loc_ not in open_list:
 				open_list += [loc_]
 				cost_list += [loc_cost + cost]
-
+		# check for no solution
 		if not open_list and loc != goal:
 			print("No path found")
 			return
@@ -163,7 +175,9 @@ def search_path(grid, init, goal, cost):
 		loc = open_list[idx_remove]
 		loc_cost = min(cost_list)
 		closed_list += [loc]
+		### up to here same as search_expand
 
+		# avoid having cells with the same cost twice in the path
 		if loc_cost > min_cost:
 			cost_nodes += [[loc]]
 			min_cost = loc_cost
@@ -203,5 +217,5 @@ if __name__ == '__main__':
 	cost = 1
 
 	# print(search(grid, init, goal, cost))
-	print(np.array(search_expand(grid, init, goal, cost)))
-	# print(search_path(grid, init, goal, cost))
+	# print(np.array(search_expand(grid, init, goal, cost)))
+	print(search_path(grid, init, goal, cost))
