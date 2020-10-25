@@ -65,7 +65,6 @@ def search(grid, init, goal, cost):
 
 	return [loc_cost, loc]
 
-
 def search_expand(grid, init, goal, cost):
 	'''
 	Given a 2D grid, perform a grid expansion that tells at which...
@@ -136,7 +135,6 @@ def search_expand(grid, init, goal, cost):
 		del cost_list[idx_remove]
 
 	return expand
-
 
 def search_path(grid, init, goal, cost):
 	'''
