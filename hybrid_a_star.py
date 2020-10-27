@@ -3,7 +3,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 WHEELBASE = 0.5
-SPEED = 1.3
+SPEED = 1.1
 NUM_THETA_CELLS = 20
 
 PseudoState = namedtuple('PseudoState',['x_idx','y_idx','stack_num'])
@@ -41,7 +41,8 @@ def search_hybrid_a_star(grid, init, goal, cost):
 	closed_list = [[[0 for i in range(len(grid[0]))] for j in range(len(grid))] for k in range(NUM_THETA_CELLS)]
 	closed_list[loc_state_.stack_num][loc_state_.x_idx][loc_state_.y_idx] = 0
 
-	came_from, valid_expand = [init], 0
+	came_from = []
+	valid_expand = 0
 
 	# create a list to store the sum of 'cost-to-reach' and 'cost-to-goal'
 	f_values = []
@@ -56,6 +57,9 @@ def search_hybrid_a_star(grid, init, goal, cost):
 			# print([loc_state_.stack_num, loc_state_.x_idx, loc_state_.y_idx])
 
 			# check for grid boundary
+			# if any([pos<0 for pos in (next_s[0], next_s[1])]) or next_s[0]>len(grid)-1 or next_s[1]>len(grid[0])-1:
+			# 	continue
+
 			if any([pos<0 for pos in (loc_state_.x_idx, loc_state_.y_idx)]) or loc_state_.x_idx>len(grid)-1 or loc_state_.y_idx>len(grid[0])-1:
 				continue
 
@@ -70,7 +74,8 @@ def search_hybrid_a_star(grid, init, goal, cost):
 				open_list += [next_s]
 				cost_list += [loc_cost + cost]
 				# compute the sum of cost-to-reach and cost-to-goal
-				f_values += [loc_cost + cost + get_heuristic([loc_state_.x_idx, loc_state_.y_idx], goal)]
+				# f_values += [loc_cost + cost + get_heuristic([loc_state_.x_idx, loc_state_.y_idx], goal)] # Use grid index for cost
+				f_values += [loc_cost + cost + get_heuristic([next_s[0], next_s[1]], goal)] # use exact location
 
 		# check if at least one exapnsion is valid from previous state
 		if valid_expand == 1:
@@ -84,8 +89,6 @@ def search_hybrid_a_star(grid, init, goal, cost):
 		idx_remove = f_values.index(min(f_values))
 		loc_state = open_list[idx_remove]
 		loc_state_cost = cost_list[idx_remove]
-		# loc_state_ = PseudoState(get_index(loc_state[0]), get_index(loc_state[1]), get_stack_num(loc_state[2]))
-		# closed_list[loc_state_.x_idx][loc_state_.x_idx][loc_state_.y_idx] = 1
 		loc = [get_index(loc_state[0]), get_index(loc_state[1])]
 
 		del open_list[idx_remove]
@@ -106,33 +109,32 @@ def plot_path(states):
 	plt.show()
 
 def main():
-	grid = [[0,1,1,0,0,0,0,0,0,0,1,1,0,0,0,0,],
-			[0,1,1,0,0,0,0,0,0,1,1,0,0,0,0,0,],
-			[0,1,1,0,0,0,0,0,1,1,0,0,0,0,0,0,],
-			[0,1,1,0,0,0,0,1,1,0,0,0,1,1,1,0,],
-			[0,1,1,0,0,0,1,1,0,0,0,1,1,1,0,0,],
-			[0,1,1,0,0,1,1,0,0,0,1,1,1,0,0,0,],
-			[0,1,1,0,1,1,0,0,0,1,1,1,0,0,0,0,],
-			[0,1,1,1,1,0,0,0,1,1,1,0,0,0,0,0,],
-			[0,1,1,1,0,0,0,1,1,1,0,0,0,0,0,0,],
-			[0,1,1,0,0,0,1,1,1,0,0,1,1,1,1,1,],
-			[0,1,0,0,0,1,1,1,0,0,1,1,1,1,1,1,],
-			[0,0,0,0,1,1,1,0,0,1,1,1,1,1,1,1,],
-			[0,0,0,1,1,1,0,0,1,1,1,1,1,1,1,1,],
-			[0,0,1,1,1,0,0,1,1,1,1,1,1,1,1,1,],
-			[0,1,1,1,0,0,0,0,0,0,0,0,0,0,0,0,],
-			[1,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,]]
+	# grid = [[0,1,1,0,0,0,0,0,0,0,1,1,0,0,0,0,],
+	# 		[0,1,1,0,0,0,0,0,0,1,1,0,0,0,0,0,],
+	# 		[0,1,1,0,0,0,0,0,1,1,0,0,0,0,0,0,],
+	# 		[0,1,1,0,0,0,0,1,1,0,0,0,1,1,1,0,],
+	# 		[0,1,1,0,0,0,1,1,0,0,0,1,1,1,0,0,],
+	# 		[0,1,1,0,0,1,1,0,0,0,1,1,1,0,0,0,],
+	# 		[0,1,1,0,1,1,0,0,0,1,1,1,0,0,0,0,],
+	# 		[0,1,1,1,1,0,0,0,1,1,1,0,0,0,0,0,],
+	# 		[0,1,1,1,0,0,0,1,1,1,0,0,0,0,0,0,],
+	# 		[0,1,1,0,0,0,1,1,1,0,0,1,1,1,1,1,],
+	# 		[0,1,0,0,0,1,1,1,0,0,1,1,1,1,1,1,],
+	# 		[0,0,0,0,1,1,1,0,0,1,1,1,1,1,1,1,],
+	# 		[0,0,0,1,1,1,0,0,1,1,1,1,1,1,1,1,],
+	# 		[0,0,1,1,1,0,0,1,1,1,1,1,1,1,1,1,],
+	# 		[0,1,1,1,0,0,0,0,0,0,0,0,0,0,0,0,],
+	# 		[1,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,]]
 
-	grid = [[0, 1, 0, 0, 0, 0],
-	        [0, 1, 0, 0, 0, 0],
-	        [0, 0, 0, 0, 0, 0],
-	        [0, 0, 0, 0, 1, 0],
-	        [0, 0, 0, 0, 1, 0]]
+	# grid = [[0, 1, 0, 0, 0, 0],
+	#         [0, 1, 0, 0, 0, 0],
+	#         [0, 0, 0, 0, 1, 0],
+	#         [0, 0, 0, 0, 1, 0]]
 
-	# grid = [[0, 1, 0, 0],
-	#         [0, 1, 0, 0],
-	#         [0, 0, 0, 0],
-	#         [0, 0, 1, 0]]
+	grid = [[0, 1, 0, 0],
+	        [0, 1, 0, 0],
+	        [0, 0, 0, 0],
+	        [0, 0, 1, 0]]
 
 	init = [0, 0, 0.]
 	goal = [len(grid)-1, len(grid[0])-1]
